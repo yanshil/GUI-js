@@ -27,6 +27,40 @@ container.appendChild( renderer.domElement );
 window.addEventListener( 'resize', onWindowResize, false );
 
 
+//======================= GUI Folder ====================
+var options, gui;
+
+function initGUI()
+{
+    options = {
+        camera: {
+            speed: 0.0001
+        },
+        reset: function() {
+            camera.position.z = 5;
+            camera.position.x = 3;
+            camera.position.y = 3;
+            this.camera.speed = 0.0001;
+
+            // cube.material.wireframe = true;
+            // cylinder.material.wireframe = true;
+        }
+    };
+
+    gui = new dat.GUI();
+    var cam = gui.addFolder('Camera');
+
+    cam.add(options.camera, 'speed', 0, 0.0010).listen();
+    cam.add(camera.position, 'y', 0, 100).listen();
+    cam.open();  
+
+    gui.add(options, 'reset');
+};
+
+initGUI();
+
+// ============================= Cube ========================
+
 function drawCube()
 {
     // TODO
@@ -41,55 +75,43 @@ function drawCube()
 
 };
 
+
+
+var cubeID = 0;
+var box;
+
 function cubeGeometry(w, h, d)
 {
     var geometry = new THREE.BoxGeometry(w, h, d, Math.floor(w), Math.floor(h), Math.floor(d) );
     // var geometry = new THREE.BoxGeometry( 3, 1, 5, 3, 1, 5 );
     var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
     var cube = new THREE.Mesh( geometry, material );
-    scene.add( cube );
+    
+    // Remove last cube
+    if (cubeID == 0) {
+        box = gui.addFolder('Cube');
+    }
+    if (cubeID > 0) {
+        // If not the very first round to create new Cube.
+        console.log("Remove Cube with ID = ", cubeID);
+        box.remove(cubewireframe);
+        remove(cubeID);
+    }
+    // Assign new ID
+    cubeID = cubeID + 1;
+    console.log("Add Cube with ID = ", cubeID);
+    cube.name = cubeID;    
+    scene.add(cube);
+
+    cubewireframe = box.add(cube.material, 'wireframe').listen();
 
 };
 
-function initGUI()
-{
-    var options = {
-        velx: 0,
-        vely: 0,
-        camera: {
-            speed: 0.0001
-        },
-        stop: function() {
-        this.velx = 0;
-        this.vely = 0;
-        },
-        reset: function() {
-        this.velx = 0.0;
-        this.vely = 0.0;
-        camera.position.z = 5;
-        camera.position.x = 3;
-        camera.position.y = 3;
-        this.camera.speed = 0.0001;
+function remove(id) {
+    scene.remove(scene.getObjectByName(id));
+}
 
-        // cube.material.wireframe = true;
-        // cylinder.material.wireframe = true;
-        }
-    };
-
-    var gui = new dat.GUI();
-    var cam = gui.addFolder('Camera');
-
-    cam.add(options.camera, 'speed', 0, 0.0010).listen();
-    cam.add(camera.position, 'y', 0, 100).listen();
-    cam.open();  
-
-    gui.add(options, 'stop');
-    gui.add(options, 'reset');
-};
-
-initGUI();
-
-
+var cld;
 function drawCylinder()
 {
     cylinder_radius = document.getElementById("cylinder_radius").value;
@@ -106,10 +128,20 @@ function cylinderGeometry(radius, height, heightSements)
     var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
     var cylinder = new THREE.Mesh( geometry, material );
     scene.add( cylinder );
+
+    cld = gui.addFolder('Cylinder');
+    cldwireframe = cld.add(cylinder.material, 'wireframe').listen();
 };
 
 var render = function () {
     requestAnimationFrame( render );
+
+    // var timer = Date.now() * options.camera.speed;
+
+    // camera.position.x = Math.cos(timer);
+    // camera.position.z = Math.sin(timer);
+
+    // console.log(camera.position.x, camera.position.y, camera.position.z);
 
     camera.lookAt(scene.position);
     camera.updateMatrixWorld();
