@@ -18,8 +18,26 @@
 				width: 100%;
 			}
 		</style>
+	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
 	</head>
 	<body>
+		<div id="cube_params">
+			<p>Cube Geometry</p>
+			<form action="#" onsubmit="drawCube()">
+				Width: <input type="number" step="any" id="cube_width"><br>
+				Height: <input type="number" step="any" id="cube_height"><br>
+				Depth: <input type="number" step="any" id="cube_depth"><br>
+				<input type="submit" value="Render Cube">
+			</form>
+		</div>
+		<div id="add_cylinder">
+			<p>Add Cylinder</p>
+			<form action="#" onsubmit="drawCylinder()">
+				Radius: <input type="number" step="any" id="cylinder_radius"><br>
+				Height: <input type="number" step="any" id="cylinder_Height"><br>
+				<input type="submit" value="Add Cylinder">
+			</form>
+		</div>
 		<div id="container"></div>
 		<script src="js/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>

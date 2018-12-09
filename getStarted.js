@@ -26,68 +26,93 @@ container.appendChild( renderer.domElement );
 // Event listener: resize window
 window.addEventListener( 'resize', onWindowResize, false );
 
-var geometry = new THREE.BoxGeometry( 3, 1, 5, 3, 1, 5 );
-var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-var cube = new THREE.Mesh( geometry, material );
-scene.add( cube );
 
-var options = {
-    velx: 0,
-    vely: 0,
-    camera: {
-        speed: 0.0001
-    },
-    stop: function() {
-    this.velx = 0;
-    this.vely = 0;
-    },
-    reset: function() {
-    this.velx = 0.01;
-    this.vely = 0.01;
-    camera.position.z = 5;
-    camera.position.x = 3;
-    camera.position.y = 3;
-    cube.scale.x = 1;
-    cube.scale.y = 1;
-    cube.scale.z = 1;
-    cube.material.wireframe = true;
-    }
+function drawCube()
+{
+    // TODO
+    // Remove the previous drawed cube object
+    cube_width = document.getElementById("cube_width").value;
+    cube_height = document.getElementById("cube_height").value;
+    cube_depth = document.getElementById("cube_depth").value;
+    
+    console.log(cube_width, cube_height, cube_depth);
+
+    cubeGeometry(cube_width, cube_height, cube_depth);
+
 };
 
-// DAT.GUI Related Stuff
+function cubeGeometry(w, h, d)
+{
+    var geometry = new THREE.BoxGeometry(w, h, d, Math.floor(w), Math.floor(h), Math.floor(d) );
+    // var geometry = new THREE.BoxGeometry( 3, 1, 5, 3, 1, 5 );
+    var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    var cube = new THREE.Mesh( geometry, material );
+    scene.add( cube );
 
-//!!!  It is unable to update geometry of mesh by a geometry object once used.
+};
 
-var gui = new dat.GUI();
+function initGUI()
+{
+    var options = {
+        velx: 0,
+        vely: 0,
+        camera: {
+            speed: 0.0001
+        },
+        stop: function() {
+        this.velx = 0;
+        this.vely = 0;
+        },
+        reset: function() {
+        this.velx = 0.0;
+        this.vely = 0.0;
+        camera.position.z = 5;
+        camera.position.x = 3;
+        camera.position.y = 3;
+        this.camera.speed = 0.0001;
 
-var box = gui.addFolder('Cube');
-// Only for demo
-box.add(cube.scale, 'x', 0, 10).name('Width').listen();
-box.add(cube.scale, 'y', 0, 10).name('Height').listen();
-box.add(cube.scale, 'z', 0, 10).name('Depth').listen();
-// CANNOT USE
-// box.add(cube.geometry.parameters, 'width', 0, 10).name('Width').listen();
-// box.add(cube.geometry.parameters, 'widthSegments', 1, 10).name('widthSegments').listen();
-box.add(cube.material, 'wireframe').listen();
-// cube.geometry.parameters.widthSegments
-box.open();
+        // cube.material.wireframe = true;
+        // cylinder.material.wireframe = true;
+        }
+    };
 
-var velocity = gui.addFolder('Velocity');
-velocity.add(options, 'velx', -0.2, 0.2).name('X').listen();
-velocity.add(options, 'vely', -0.2, 0.2).name('Y').listen();
-velocity.close();
+    var gui = new dat.GUI();
+    var cam = gui.addFolder('Camera');
 
-gui.add(options, 'stop');
-gui.add(options, 'reset');
+    cam.add(options.camera, 'speed', 0, 0.0010).listen();
+    cam.add(camera.position, 'y', 0, 100).listen();
+    cam.open();  
+
+    gui.add(options, 'stop');
+    gui.add(options, 'reset');
+};
+
+initGUI();
+
+
+function drawCylinder()
+{
+    cylinder_radius = document.getElementById("cylinder_radius").value;
+    cylinder_height = document.getElementById("cylinder_Height").value;
+
+    cylinderGeometry(cylinder_radius, cylinder_height, 32);
+}
+
+// cylinderGeometry(radius, height, heightSements)
+function cylinderGeometry(radius, height, heightSements)
+{
+    // RadiusTop, radiusBottom, height, radialSegments, HeightSegments
+    var geometry = new THREE.CylinderGeometry( radius, radius, height, heightSements );
+    var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+    var cylinder = new THREE.Mesh( geometry, material );
+    scene.add( cylinder );
+};
 
 var render = function () {
     requestAnimationFrame( render );
 
     camera.lookAt(scene.position);
     camera.updateMatrixWorld();
-
-    cube.rotation.x += options.velx;
-    cube.rotation.y += options.vely;
 
     renderer.render( scene, camera );
 };
