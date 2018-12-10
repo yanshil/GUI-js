@@ -62,6 +62,7 @@ initGUI();
 
 // ============================= Cube ========================
 
+var cube_width, cube_height, cube_depth;
 function drawCube()
 {
     cube_width = document.getElementById("cube_width").value;
@@ -125,16 +126,16 @@ var cldFolder = [];
 function drawCylinder()
 {
     cylinder_radius = document.getElementById("cylinder_radius").value;
-    cylinder_height = document.getElementById("cylinder_Height").value;
+    cylinder_segments = document.getElementById("cylinder_segments").value;
 
-    cylinderGeometry(cylinder_radius, cylinder_height, 32);
+    cylinderGeometry(cylinder_radius, cube_height, cylinder_segments);
 }
 
 // cylinderGeometry(radius, height, heightSements)
-function cylinderGeometry(radius, height, heightSements)
+function cylinderGeometry(radius, height, cylinder_segments)
 {
     // RadiusTop, radiusBottom, height, radialSegments, HeightSegments
-    var geometry = new THREE.CylinderGeometry( radius, radius, height, heightSements );
+    var geometry = new THREE.CylinderGeometry( radius, radius, height, cylinder_segments);
     var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
     var cylinder = new THREE.Mesh( geometry, material );
 
@@ -146,7 +147,6 @@ function cylinderGeometry(radius, height, heightSements)
     cld_group.add(cylinder);
     scene.add(cld_group);
     
-
     // scene.add( cylinder );
     console.log("Add cylinder with ID = ", cylinderID);
 
