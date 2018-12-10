@@ -46,6 +46,16 @@
 					</form>
 				</div>
 		</div>
+		<!-- <div>
+			<form action="#" onsubmit="export2PLY()">
+				<input type="submit" value="Export2PLY">
+			</form>
+		</div> -->
+		<div>
+			<form action="#" onsubmit="export2OBJ()">
+				<input type="submit" value="Export2OBJ">
+			</form>
+		</div>
 		<br>
 		<div id="container"></div>
 		<script src="js/three.js"></script>
@@ -53,6 +63,8 @@
 		<script src="js/renderers/Projector.js"></script>
 		<script materialrc="js/WebGL.js"></script>
 		<script src="js/libs/dat.gui.min.js"></script>
-		<script src="getStarted.js"></script>		
+		<script src="getStarted.js"></script>
+		<!-- <script src="js/exporters/PLYExporter.js"></script> -->
+		<script src="js/exporters/OBJExporter.js"></script>
 	</body>
 </html>

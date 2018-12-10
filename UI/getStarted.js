@@ -252,3 +252,24 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
     renderer.setSize( window.innerWidth, window.innerHeight );
 }
+
+// ================= Exporter =========================
+
+function export2PLY()
+{
+    // Instantiate an exporter
+    var exporter = new THREE.PLYExporter();
+    // Parse the input and generate the ply output
+    exporter.parse(scene, data => console.log(data), { binary: true, excludeAttributes: [ 'color' ] });
+}
+
+function export2OBJ()
+{
+    // Instantiate an exporter
+    var exporter = new THREE.OBJExporter();
+    // var data = exporter.parse(cube);
+    for (let i = 0; i < scene.children.length; i++) {
+        data = exporter.parse(scene.children[i]);
+        console.log(data);
+    }
+}
