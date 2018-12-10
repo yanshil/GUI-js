@@ -28,31 +28,32 @@ window.addEventListener( 'resize', onWindowResize, false );
 
 
 //======================= GUI Folder ====================
-var options, gui;
-
-
+// Custom Global Variables
+var parameters, gui;
+var cube;
 
 function initGUI()
 {
-    options = {
+    parameters = {
         cube: {
             width:3,
             height:1,
             depth:5,
-            wireframe: true
+            material: "Wireframe",
         },
         cylinder: {
             position_x: 0,
-            posision_y: 0,
+            position_y: 0,
+            position_z: 0,
             radius: 1,
             mesh_segments:32,
         },
         renderBox: function() {
-            
             cubeGeometry(this.cube.width, this.cube.height, this.cube.depth);
         },
         addCylinder: function() {
-            cylinderGeometry(this.cylinder.radius, this.cube.height, this.cylinder.mesh_segments);
+            cylinderGeometry(this.cylinder.radius, this.cube.height, this.cylinder.mesh_segments, 
+                this.cylinder.position_x, this.cylinder.position_y, this.cylinder.position_z);
         },
         removeAllCylinder: function() {
             removeCylinders();
@@ -75,26 +76,33 @@ function initGUI()
 
     // Box
     var boxxx = gui.addFolder('Boxxx');
-    boxxx.add(options.cube, 'width').name('width');
-    boxxx.add(options.cube, 'height').name('height');
-    boxxx.add(options.cube, 'depth').name('depth');
-    // boxxx.add(options.cube, 'wireframe').name('wireframe');
-    boxxx.add(options, 'renderBox').name('Render Box');
+    boxxx.add(parameters.cube, 'width').name('width');
+    boxxx.add(parameters.cube, 'height').name('height');
+    boxxx.add(parameters.cube, 'depth').name('depth');
+    var cubeMaterial = boxxx.add( parameters.cube, 'material', [ "Basic", "Lambert", "Phong", "Wireframe" ] ).name('Material Type').listen();
+	cubeMaterial.onChange(function(value) 
+	{   updateMaterial();   });
+    boxxx.add(parameters, 'renderBox').name('Render Box');
     boxxx.open();
 
     // Cylinder
     var cylinder = gui.addFolder('Cylinder');
-    cylinder.add(options, 'addCylinder').name('Add New Cylinder');
-    cylinder.add(options, 'removeAllCylinder').name('Remove Cylinders');
+    cylinder.add(parameters.cylinder, 'position_x').name('x');
+    cylinder.add(parameters.cylinder, 'position_y').name('y (no use)');
+    cylinder.add(parameters.cylinder, 'position_z').name('z');
+    cylinder.add(parameters.cylinder, 'radius').name('radius');
+    cylinder.add(parameters.cylinder, 'mesh_segments').name('face segments');
+    cylinder.add(parameters, 'addCylinder').name('Add new cld');
+    cylinder.add(parameters, 'removeAllCylinder').name('rm all clds');
 
     // Camera
     var cam = gui.addFolder('Camera');
-    // cam.add(options.camera, 'speed', 0, 0.0010).listen();
+    // cam.add(parameters.camera, 'speed', 0, 0.0010).listen();
     cam.add(camera.position, 'y', 0, 100).listen();
-    cam.add(options, 'reset');
+    cam.add(parameters, 'reset');
     cam.close();
     
-    gui.add(options, 'export2OBJ');
+    gui.add(parameters, 'export2OBJ');
 };
 
 initGUI();
@@ -107,14 +115,11 @@ initGUI();
 
 var cubeID = 0, cylinderID = 0;
 
-var box;
-
 function cubeGeometry(w, h, d)
 {
     var geometry = new THREE.BoxGeometry(w, h, d, Math.floor(w), Math.floor(h), Math.floor(d) );
-    // var geometry = new THREE.BoxGeometry( 3, 1, 5, 3, 1, 5 );
     var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-    var cube = new THREE.Mesh( geometry, material );
+    cube = new THREE.Mesh( geometry, material );
 
     // Remove last cube if not the very first one
     // Only one cube exist for current scene
@@ -139,6 +144,23 @@ function remove(id) {
     scene.remove(v);
 }
 
+// ========
+function updateMaterial()
+{
+    var value = parameters.cube.material;
+    var newMaterial;
+	if (value == "Basic")
+		newMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+	else if (value == "Lambert")
+		newMaterial = new THREE.MeshLambertMaterial( { color: 0x00ff00 } );
+	else if (value == "Phong")
+		newMaterial = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
+	else // (value == "Wireframe")
+        newMaterial = new THREE.MeshBasicMaterial( { wireframe: true } );
+    
+    cube.material = newMaterial;
+}
+
 //======================= Cylinders =================
 
 var cld_group = new THREE.Group();
@@ -147,12 +169,30 @@ var cld;
 var cldFolder = [];
 
 // cylinderGeometry(radius, height, heightSements)
-function cylinderGeometry(radius, height, cylinder_segments)
+function cylinderGeometry(radius, height, cylinder_segments, position_x, position_y, position_z)
 {
+    if(cylinder_segments < 8)
+    {
+        alert("Too few face segments will cause problems!");
+    }
+
+    // if cylinder outside Box, return with alert
+
+
+
     // RadiusTop, radiusBottom, height, radialSegments, HeightSegments
     var geometry = new THREE.CylinderGeometry( radius, radius, height, cylinder_segments);
     var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
     var cylinder = new THREE.Mesh( geometry, material );
+
+    console.log(radius, height,cylinder_segments);
+    console.log(position_x, position_y,position_z);
+
+    // Adjust position
+    cylinder.position.x = position_x;
+    // cylinder.position.y = position_y;
+    cylinder.position.y = cube.position.y;  // Make sure cut through the BOX!
+    cylinder.position.z = position_z;
 
     // Assign new ID
     cylinderID = cylinderID + 1;
@@ -246,7 +286,7 @@ var render = function () {
 
     requestAnimationFrame( render );
 
-    // var timer = Date.now() * options.camera.speed;
+    // var timer = Date.now() * parameters.camera.speed;
 
     // camera.position.x = Math.cos(timer);
     // camera.position.z = Math.sin(timer);

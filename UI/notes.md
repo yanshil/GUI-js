@@ -9,6 +9,9 @@
 * http://stemkoski.github.io/Three.js/GUI.html
 * https://github.com/stemkoski/stemkoski.github.com/blob/master/Three.js/GUI.html
 
+### CSG!
+* https://github.com/mrdoob/three.js/issues/866
+* http://learningthreejs.com/blog/2011/12/10/constructive-solid-geometry-with-csg-js/
 
 ## QA
 * https://stackoverflow.com/questions/25766981/changing-a-three-js-objects-geometry
