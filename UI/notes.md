@@ -6,8 +6,12 @@
 * http://davidscottlyons.com/threejs-intro/#slide-45
 * https://threejs.org/docs/#api/en/geometries/CylinderGeometry
 * https://threejs.org/docs/#api/en/core/Raycaster
-
+* http://stemkoski.github.io/Three.js/GUI.html
+* https://github.com/stemkoski/stemkoski.github.com/blob/master/Three.js/GUI.html
 
 
 ## QA
 * https://stackoverflow.com/questions/25766981/changing-a-three-js-objects-geometry
+
+* http://learningthreejs.com/blog/2013/04/30/closing-the-gap-between-html-and-webgl/
+> Well, not quite unfortunatly… WebGL is 3d inside a canvas element and a canvas is a black box from the html page point of view. You can’t bind DOM events inside canvas. You can’t have stylesheet to change canvas content. You can’t put dom elements inside your canvas. Those two don’t talk to each other.

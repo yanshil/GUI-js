@@ -22,41 +22,6 @@
 	</head>
 	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
 	<body>
-		<div class="Input Field">
-				<div id="cube_params">
-					<p>Cube Geometry</p>
-					<form action="#" onsubmit="drawCube()">
-						Width: <input type="number" step="any" id="cube_width"><br>
-						Height: <input type="number" step="any" id="cube_height"><br>
-						Depth: <input type="number" step="any" id="cube_depth"><br>
-						<input type="submit" value="Render Cube">
-					</form>
-				</div>
-				<div id="add_cylinder">
-					<p>Add Cylinder</p>
-					<form action="#" onsubmit="drawCylinder()">
-						Radius: <input type="number" step="any" id="cylinder_radius"><br>
-						Radial Segments: <input type="number" step="any" id="cylinder_segments"><br>
-						<input type="submit" value="Add Cylinder">
-					</form>
-				</div>
-				<div id="removeCylinders">
-					<form action="#" onsubmit="removeCylinders()">
-						<input type="submit" value="Remove All Cylinders">
-					</form>
-				</div>
-		</div>
-		<!-- <div>
-			<form action="#" onsubmit="export2PLY()">
-				<input type="submit" value="Export2PLY">
-			</form>
-		</div> -->
-		<div>
-			<form action="#" onsubmit="export2OBJ()">
-				<input type="submit" value="Export2OBJ">
-			</form>
-		</div>
-		<br>
 		<div id="container"></div>
 		<script src="js/three.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>

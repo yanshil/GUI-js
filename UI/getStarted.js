@@ -30,9 +30,33 @@ window.addEventListener( 'resize', onWindowResize, false );
 //======================= GUI Folder ====================
 var options, gui;
 
+
+
 function initGUI()
 {
     options = {
+        cube: {
+            width:3,
+            height:1,
+            depth:5,
+            wireframe: true
+        },
+        cylinder: {
+            position_x: 0,
+            posision_y: 0,
+            radius: 1,
+            mesh_segments:32,
+        },
+        renderBox: function() {
+            
+            cubeGeometry(this.cube.width, this.cube.height, this.cube.depth);
+        },
+        addCylinder: function() {
+            cylinderGeometry(this.cylinder.radius, this.cube.height, this.cylinder.mesh_segments);
+        },
+        removeAllCylinder: function() {
+            removeCylinders();
+        },
         camera: {
             speed: 0.0001
         },
@@ -41,17 +65,36 @@ function initGUI()
             camera.position.x = 3;
             camera.position.y = 3;
             this.camera.speed = 0.0001;
+        },
+        export2OBJ: function(){
+            export2OBJ();
         }
     };
 
     gui = new dat.GUI();
+
+    // Box
+    var boxxx = gui.addFolder('Boxxx');
+    boxxx.add(options.cube, 'width').name('width');
+    boxxx.add(options.cube, 'height').name('height');
+    boxxx.add(options.cube, 'depth').name('depth');
+    // boxxx.add(options.cube, 'wireframe').name('wireframe');
+    boxxx.add(options, 'renderBox').name('Render Box');
+    boxxx.open();
+
+    // Cylinder
+    var cylinder = gui.addFolder('Cylinder');
+    cylinder.add(options, 'addCylinder').name('Add New Cylinder');
+    cylinder.add(options, 'removeAllCylinder').name('Remove Cylinders');
+
+    // Camera
     var cam = gui.addFolder('Camera');
-
-    cam.add(options.camera, 'speed', 0, 0.0010).listen();
+    // cam.add(options.camera, 'speed', 0, 0.0010).listen();
     cam.add(camera.position, 'y', 0, 100).listen();
-    cam.open();  
-
-    gui.add(options, 'reset');
+    cam.add(options, 'reset');
+    cam.close();
+    
+    gui.add(options, 'export2OBJ');
 };
 
 initGUI();
@@ -62,54 +105,33 @@ initGUI();
 
 // ============================= Cube ========================
 
-var cube_width, cube_height, cube_depth;
-function drawCube()
-{
-    cube_width = document.getElementById("cube_width").value;
-    cube_height = document.getElementById("cube_height").value;
-    cube_depth = document.getElementById("cube_depth").value;
-    
-    console.log(cube_width, cube_height, cube_depth);
-
-    cubeGeometry(cube_width, cube_height, cube_depth);
-};
-
 var cubeID = 0, cylinderID = 0;
+
 var box;
-
-
-var cube;
 
 function cubeGeometry(w, h, d)
 {
     var geometry = new THREE.BoxGeometry(w, h, d, Math.floor(w), Math.floor(h), Math.floor(d) );
     // var geometry = new THREE.BoxGeometry( 3, 1, 5, 3, 1, 5 );
     var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-    cube = new THREE.Mesh( geometry, material );
-    
-    // Remove last cube
-    if (cubeID == 0) {
-        box = gui.addFolder('Cube');
-    }
+    var cube = new THREE.Mesh( geometry, material );
+
+    // Remove last cube if not the very first one
+    // Only one cube exist for current scene
     if (cubeID > 0) {
         // If not the very first round to create new Cube.
         console.log("Remove Cube with ID = ", cubeID);
-        box.remove(cubewireframe);
         remove(cubeID);
     }
     // Assign new ID
     cubeID = cubeID + 1;
     console.log("Add Cube with ID = ", cubeID);
     cube.name = cubeID;
-    scene.add(cube);
-
     cube.material.wireframe = true;
-    cubewireframe = box.add(cube.material, 'wireframe').listen();
-    box.open();
-
+    scene.add(cube);
 };
 
-// GC
+// Remove with GC
 function remove(id) {
     v = scene.getObjectByName(id);
     v.material.dispose();
@@ -123,13 +145,6 @@ var cld_group = new THREE.Group();
 
 var cld;
 var cldFolder = [];
-function drawCylinder()
-{
-    cylinder_radius = document.getElementById("cylinder_radius").value;
-    cylinder_segments = document.getElementById("cylinder_segments").value;
-
-    cylinderGeometry(cylinder_radius, cube_height, cylinder_segments);
-}
 
 // cylinderGeometry(radius, height, heightSements)
 function cylinderGeometry(radius, height, cylinder_segments)
@@ -151,7 +166,7 @@ function cylinderGeometry(radius, height, cylinder_segments)
     console.log("Add cylinder with ID = ", cylinderID);
 
     if (cylinderID == 1) {
-        cld = gui.addFolder('Cylinder');
+        cld = gui.addFolder('Cylinder Groups');
     }
 
     cld_group.children[cylinderID-1].material.wireframe = true;
@@ -184,7 +199,7 @@ function removeCylinders()
     }
     // Reset CylinderID
     cylinderID = 0;
-    gui.removeFolder('Cylinder');
+    gui.removeFolder('Cylinder Groups');
 };
 
 //========================= RayCast ================================
