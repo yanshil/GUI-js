@@ -41,9 +41,6 @@ function initGUI()
             camera.position.x = 3;
             camera.position.y = 3;
             this.camera.speed = 0.0001;
-
-            // cube.material.wireframe = true;
-            // cylinder.material.wireframe = true;
         }
     };
 
@@ -59,12 +56,14 @@ function initGUI()
 
 initGUI();
 
+//=================== Obejct List ===============================
+
+// var group = new THREE.Group();
+
 // ============================= Cube ========================
 
 function drawCube()
 {
-    // TODO
-    // Remove the previous drawed cube object
     cube_width = document.getElementById("cube_width").value;
     cube_height = document.getElementById("cube_height").value;
     cube_depth = document.getElementById("cube_depth").value;
@@ -72,20 +71,20 @@ function drawCube()
     console.log(cube_width, cube_height, cube_depth);
 
     cubeGeometry(cube_width, cube_height, cube_depth);
-
 };
 
-
-
-var cubeID = 0;
+var cubeID = 0, cylinderID = 0;
 var box;
+
+
+var cube;
 
 function cubeGeometry(w, h, d)
 {
     var geometry = new THREE.BoxGeometry(w, h, d, Math.floor(w), Math.floor(h), Math.floor(d) );
     // var geometry = new THREE.BoxGeometry( 3, 1, 5, 3, 1, 5 );
     var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-    var cube = new THREE.Mesh( geometry, material );
+    cube = new THREE.Mesh( geometry, material );
     
     // Remove last cube
     if (cubeID == 0) {
@@ -100,18 +99,29 @@ function cubeGeometry(w, h, d)
     // Assign new ID
     cubeID = cubeID + 1;
     console.log("Add Cube with ID = ", cubeID);
-    cube.name = cubeID;    
+    cube.name = cubeID;
     scene.add(cube);
 
+    cube.material.wireframe = true;
     cubewireframe = box.add(cube.material, 'wireframe').listen();
+    box.open();
 
 };
 
+// GC
 function remove(id) {
-    scene.remove(scene.getObjectByName(id));
+    v = scene.getObjectByName(id);
+    v.material.dispose();
+    v.geometry.dispose();
+    scene.remove(v);
 }
 
+//======================= Cylinders =================
+
+var cld_group = new THREE.Group();
+
 var cld;
+var cldFolder = [];
 function drawCylinder()
 {
     cylinder_radius = document.getElementById("cylinder_radius").value;
@@ -127,13 +137,98 @@ function cylinderGeometry(radius, height, heightSements)
     var geometry = new THREE.CylinderGeometry( radius, radius, height, heightSements );
     var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
     var cylinder = new THREE.Mesh( geometry, material );
-    scene.add( cylinder );
 
-    cld = gui.addFolder('Cylinder');
-    cldwireframe = cld.add(cylinder.material, 'wireframe').listen();
+    // Assign new ID
+    cylinderID = cylinderID + 1;
+    cylinder.name = cylinderID;
+
+    scene.remove(cld_group);
+    cld_group.add(cylinder);
+    scene.add(cld_group);
+    
+
+    // scene.add( cylinder );
+    console.log("Add cylinder with ID = ", cylinderID);
+
+    if (cylinderID == 1) {
+        cld = gui.addFolder('Cylinder');
+    }
+
+    cld_group.children[cylinderID-1].material.wireframe = true;
+    var tmp = cld.add(cld_group.children[cylinderID-1].material, 'wireframe').name('wireframe'+ (cylinderID)).listen();
+    cldFolder.push(tmp);
+    cld.open();
+
 };
 
+dat.GUI.prototype.removeFolder = function(name) {
+    var folder = this.__folders[name];
+    if (!folder) {
+      return;
+    }
+    folder.close();
+    this.__ul.removeChild(folder.domElement.parentNode);
+    delete this.__folders[name];
+    this.onResize();
+}
+
+function removeCylinders()
+{
+    for (var i = cld_group.children.length - 1; i >= 0; i--) {
+        var object = cld_group.children[i];
+        cld_group.remove(object);
+
+        object.material.dispose();
+        object.geometry.dispose();
+        scene.remove(object);
+    }
+    // Reset CylinderID
+    cylinderID = 0;
+    gui.removeFolder('Cylinder');
+};
+
+//========================= RayCast ================================
+// // https://threejs.org/docs/#api/en/core/Raycaster
+// var raycaster = new THREE.Raycaster();
+// var mouse = new THREE.Vector2();
+
+// function cursorPositionInCanvas(canvas, event) {
+//     var x, y;
+
+//     canoffset = $(canvas).offset();
+//     x = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - Math.floor(canoffset.left);
+//     y = event.clientY + document.body.scrollTop + document.documentElement.scrollTop - Math.floor(canoffset.top) + 1;
+
+//     return [x,y];
+// }
+
+// function onDocumentMouseDown(event) {
+
+//     event.preventDefault();
+
+//     // mouse.x = (cursorPositionInCanvas( renderer.domElement, event )[0]) / $(canvas).width() * 2 - 1;
+//     // mouse.y = - (cursorPositionInCanvas( renderer.domElement, event )[1])/ $(canvas).height() * 2 + 1;
+//     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+// 	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+//     raycaster.setFromCamera( mouse, camera );
+
+//     var intersects = raycaster.intersectObjects(scene.children);
+
+//     console.log(intersects);
+
+//     if (intersects.length > 0) {
+//         intersects[ i ].object.material.color.set( 0xff0000 );
+//     }
+// }
+
+// document.addEventListener('mousedown', onDocumentMouseDown, false);
+
+
+//========================== Render ================================
+
 var render = function () {
+
     requestAnimationFrame( render );
 
     // var timer = Date.now() * options.camera.speed;
