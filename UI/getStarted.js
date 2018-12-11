@@ -284,7 +284,7 @@ function onDocumentMouseDown(event) {
 
     if (intersects.length > 0) {
 
-        intersects[ 0 ].object.material.color.set( 0x000000 );
+        // intersects[ 0 ].object.material.color.set( 0x000000 );
 
         console.log(intersects[0]);
         // point, face, object....
