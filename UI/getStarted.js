@@ -283,13 +283,18 @@ function onDocumentMouseDown(event) {
     console.log(intersects);
 
     if (intersects.length > 0) {
+
         intersects[ 0 ].object.material.color.set( 0x000000 );
+
         console.log(intersects[0]);
         // point, face, object....
         console.log(intersects[0].point);
         // parameters.cylinder.position_x = intersects[0].point.x;
         // parameters.cylinder.position_y = intersects[0].point.y;
         // parameters.cylinder.position_z = intersects[0].point.z;
+    }
+    if (intersects.length == 0) {
+        cube.material.color.set( 0x00ff00 );
     }
 }
 
