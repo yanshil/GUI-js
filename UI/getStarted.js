@@ -41,10 +41,10 @@ function initGUI()
             material: "Wireframe",
         },
         cylinder: {
-            position_x: 0,
-            position_y: 0,
-            position_z: 0,
-            radius: 1,
+            position_x: 0.0,
+            position_y: 0.0,
+            position_z: 0.0,
+            radius: 1.0,
             mesh_segments:32,
         },
         renderBox: function() {
@@ -175,7 +175,7 @@ function sdfBox(point)
 
     return d;
 }
-
+parameters.cylinder
 //======================= Cylinders =================
 
 var cld_group = new THREE.Group();
@@ -248,7 +248,7 @@ dat.GUI.prototype.removeFolder = function(name) {
 
 function removeCylinders()
 {
-    for (var i = cld_group.children.length - 1; i >= 0; i--) {
+    for (var i = cld_group.children.length - 1; i >= 0; i--) {parameters.cylinder
         var object = cld_group.children[i];
         cld_group.remove(object);
 
@@ -264,29 +264,36 @@ function removeCylinders()
 //========================= RayCast ================================
 // https://threejs.org/docs/#api/en/core/Raycaster
 
-// var raycaster = new THREE.Raycaster();
-// var mouse = new THREE.Vector2();
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2();
 
-// function onDocumentMouseDown(event) {
+function onDocumentMouseDown(event) {
 
-//     event.preventDefault();
+    // Orbit Controls cannot use this???? What????
+    // https://github.com/sotownsend/dat-gui/issues/5
+    // event.preventDefault();
 
-//     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-// 	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
-//     raycaster.setFromCamera( mouse, camera );
+    raycaster.setFromCamera( mouse, camera );
 
-//     var intersects = raycaster.intersectObjects(scene.children);
+    var intersects = raycaster.intersectObjects(scene.children);
 
-//     console.log(intersects);
+    console.log(intersects);
 
-//     if (intersects.length > 0) {
-//         intersects[ 0 ].object.material.color.set( 0xff0000 );
-//         console.log(intersects[0]);
-//     }
-// }
+    if (intersects.length > 0) {
+        intersects[ 0 ].object.material.color.set( 0x000000 );
+        console.log(intersects[0]);
+        // point, face, object....
+        console.log(intersects[0].point);
+        // parameters.cylinder.position_x = intersects[0].point.x;
+        // parameters.cylinder.position_y = intersects[0].point.y;
+        // parameters.cylinder.position_z = intersects[0].point.z;
+    }
+}
 
-// document.addEventListener('mousedown', onDocumentMouseDown, false);
+document.addEventListener('mousedown', onDocumentMouseDown, false);
 
 
 //========================== Render ================================
