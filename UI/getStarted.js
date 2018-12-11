@@ -156,7 +156,7 @@ function updateMaterial()
 	else if (value == "Phong")
 		newMaterial = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
 	else // (value == "Wireframe")
-        newMaterial = new THREE.MeshBasicMaterial( { wireframe: true } );
+        newMaterial = new THREE.MeshBasicMaterial( { wireframe: true, color: 0x00ff00  } );
     
     cube.material = newMaterial;
 }
@@ -196,8 +196,7 @@ function cylinderGeometry(radius, height, cylinder_segments, position_x, positio
     // if cylinder outside Box, return with alert
     // Radius cannot larger than SDF
     var d = sdfBox(center);
-    // console.log(radius);
-    // console.log(d);
+    
     if((radius > Math.abs(d)) | d > 0)
     {
         alert("Cylinder outside box! Fail to create this cylinder");
@@ -206,11 +205,8 @@ function cylinderGeometry(radius, height, cylinder_segments, position_x, positio
 
     // RadiusTop, radiusBottom, height, radialSegments, HeightSegments
     var geometry = new THREE.CylinderGeometry( radius, radius, height, cylinder_segments);
-    var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+    var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
     var cylinder = new THREE.Mesh( geometry, material );
-
-    // console.log(radius, height,cylinder_segments);
-    // console.log(position_x, position_y,position_z);
 
     // Adjust position
     cylinder.position.x = position_x;
