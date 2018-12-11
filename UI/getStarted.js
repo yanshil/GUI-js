@@ -27,6 +27,10 @@ container.appendChild( renderer.domElement );
 window.addEventListener( 'resize', onWindowResize, false );
 
 
+// MouseDown!!
+window.addEventListener( 'mousedown', onDocumentMouseDown, false );
+
+
 //======================= GUI Folder ====================
 // Custom Global Variables
 var parameters, gui;
@@ -263,9 +267,9 @@ function removeCylinders()
 };
 
 //========================= RayCast ================================
-// // https://threejs.org/docs/#api/en/core/Raycaster
-// var raycaster = new THREE.Raycaster();
-// var mouse = new THREE.Vector2();
+// https://threejs.org/docs/#api/en/core/Raycaster
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2();
 
 // function cursorPositionInCanvas(canvas, event) {
 //     var x, y;
@@ -277,27 +281,28 @@ function removeCylinders()
 //     return [x,y];
 // }
 
-// function onDocumentMouseDown(event) {
+function onDocumentMouseDown(event) {
 
-//     event.preventDefault();
+    event.preventDefault();
 
-//     // mouse.x = (cursorPositionInCanvas( renderer.domElement, event )[0]) / $(canvas).width() * 2 - 1;
-//     // mouse.y = - (cursorPositionInCanvas( renderer.domElement, event )[1])/ $(canvas).height() * 2 + 1;
-//     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-// 	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    // mouse.x = (cursorPositionInCanvas( renderer.domElement, event )[0]) / $(canvas).width() * 2 - 1;
+    // mouse.y = - (cursorPositionInCanvas( renderer.domElement, event )[1])/ $(canvas).height() * 2 + 1;
+    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
-//     raycaster.setFromCamera( mouse, camera );
+    raycaster.setFromCamera( mouse, camera );
 
-//     var intersects = raycaster.intersectObjects(scene.children);
+    var intersects = raycaster.intersectObjects(scene.children);
 
-//     console.log(intersects);
+    console.log(intersects);
 
-//     if (intersects.length > 0) {
-//         intersects[ i ].object.material.color.set( 0xff0000 );
-//     }
-// }
+    if (intersects.length > 0) {
+        intersects[ 0 ].object.material.color.set( 0xff0000 );
+        console.log(intersects[0]);
+    }
+}
 
-// document.addEventListener('mousedown', onDocumentMouseDown, false);
+document.addEventListener('mousedown', onDocumentMouseDown, false);
 
 
 //========================== Render ================================
