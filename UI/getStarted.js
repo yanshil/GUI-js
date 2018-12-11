@@ -26,11 +26,6 @@ container.appendChild( renderer.domElement );
 // Event listener: resize window
 window.addEventListener( 'resize', onWindowResize, false );
 
-
-// MouseDown!!
-window.addEventListener( 'mousedown', onDocumentMouseDown, false );
-
-
 //======================= GUI Folder ====================
 // Custom Global Variables
 var parameters, gui;
@@ -124,6 +119,7 @@ function cubeGeometry(w, h, d)
     var geometry = new THREE.BoxGeometry(w, h, d, Math.floor(w), Math.floor(h), Math.floor(d) );
     var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
     cube = new THREE.Mesh( geometry, material );
+    updateMaterial();
 
     // Remove last cube if not the very first one
     // Only one cube exist for current scene
@@ -136,7 +132,6 @@ function cubeGeometry(w, h, d)
     cubeID = cubeID + 1;
     console.log("Add Cube with ID = ", cubeID);
     cube.name = cubeID;
-    cube.material.wireframe = true;
     scene.add(cube);
 };
 
@@ -268,41 +263,30 @@ function removeCylinders()
 
 //========================= RayCast ================================
 // https://threejs.org/docs/#api/en/core/Raycaster
-var raycaster = new THREE.Raycaster();
-var mouse = new THREE.Vector2();
 
-// function cursorPositionInCanvas(canvas, event) {
-//     var x, y;
+// var raycaster = new THREE.Raycaster();
+// var mouse = new THREE.Vector2();
 
-//     canoffset = $(canvas).offset();
-//     x = event.clientX + document.body.scrollLeft + document.documentElement.scrollLeft - Math.floor(canoffset.left);
-//     y = event.clientY + document.body.scrollTop + document.documentElement.scrollTop - Math.floor(canoffset.top) + 1;
+// function onDocumentMouseDown(event) {
 
-//     return [x,y];
+//     event.preventDefault();
+
+//     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+// 	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+//     raycaster.setFromCamera( mouse, camera );
+
+//     var intersects = raycaster.intersectObjects(scene.children);
+
+//     console.log(intersects);
+
+//     if (intersects.length > 0) {
+//         intersects[ 0 ].object.material.color.set( 0xff0000 );
+//         console.log(intersects[0]);
+//     }
 // }
 
-function onDocumentMouseDown(event) {
-
-    event.preventDefault();
-
-    // mouse.x = (cursorPositionInCanvas( renderer.domElement, event )[0]) / $(canvas).width() * 2 - 1;
-    // mouse.y = - (cursorPositionInCanvas( renderer.domElement, event )[1])/ $(canvas).height() * 2 + 1;
-    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-    raycaster.setFromCamera( mouse, camera );
-
-    var intersects = raycaster.intersectObjects(scene.children);
-
-    console.log(intersects);
-
-    if (intersects.length > 0) {
-        intersects[ 0 ].object.material.color.set( 0xff0000 );
-        console.log(intersects[0]);
-    }
-}
-
-document.addEventListener('mousedown', onDocumentMouseDown, false);
+// document.addEventListener('mousedown', onDocumentMouseDown, false);
 
 
 //========================== Render ================================
