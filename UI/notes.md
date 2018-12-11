@@ -16,6 +16,7 @@ http://www.yanshil.com/GUI-js/UI/index.html
 ### CSG!
 * https://github.com/mrdoob/three.js/issues/866
 * http://learningthreejs.com/blog/2011/12/10/constructive-solid-geometry-with-csg-js/
+* http://jsfiddle.net/kdrobian/wovq59cx/
 
 ## QA
 * https://stackoverflow.com/questions/25766981/changing-a-three-js-objects-geometry
