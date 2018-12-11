@@ -161,6 +161,22 @@ function updateMaterial()
     cube.material = newMaterial;
 }
 
+// 'Fake' SDF. For not calculating the 'y' axis
+function sdfBox(point)
+{
+    // Do not care about y though
+    var x= Math.max(point.x - cube.position.x - parameters.cube.width / 2 , 
+        cube.position.x - point.x - parameters.cube.width / 2 );
+    // var y= Math.max(point.y - cube.position.y - parameters.cube.height / 2 , 
+    //     cube.position.y - point.y - parameters.cube.height / 2 );
+    var z= Math.max(point.z - cube.position.z - parameters.cube.depth / 2 , 
+        cube.position.z - point.z - parameters.cube.depth / 2 );
+    // var d = Math.max(x, y, z);
+    var d = Math.max(x, z);
+
+    return d;
+}
+
 //======================= Cylinders =================
 
 var cld_group = new THREE.Group();
@@ -175,18 +191,26 @@ function cylinderGeometry(radius, height, cylinder_segments, position_x, positio
     {
         alert("Too few face segments will cause problems!");
     }
+    var center = new THREE.Vector3( position_x, cube.position.y, position_z );
 
     // if cylinder outside Box, return with alert
-
-
+    // Radius cannot larger than SDF
+    var d = sdfBox(center);
+    // console.log(radius);
+    // console.log(d);
+    if((radius > Math.abs(d)) | d > 0)
+    {
+        alert("Cylinder outside box! Fail to create this cylinder");
+        return;
+    }
 
     // RadiusTop, radiusBottom, height, radialSegments, HeightSegments
     var geometry = new THREE.CylinderGeometry( radius, radius, height, cylinder_segments);
     var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
     var cylinder = new THREE.Mesh( geometry, material );
 
-    console.log(radius, height,cylinder_segments);
-    console.log(position_x, position_y,position_z);
+    // console.log(radius, height,cylinder_segments);
+    // console.log(position_x, position_y,position_z);
 
     // Adjust position
     cylinder.position.x = position_x;
