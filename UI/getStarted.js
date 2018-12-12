@@ -10,6 +10,20 @@ camera.position.y = 3;
 camera.position.z = 5;
 scene.add( camera );
 
+
+// =========================Axis Helper =============
+// The X axis is red. The Y axis is green. The Z axis is blue.
+var axisHelper = new THREE.AxesHelper( 5 );
+scene.add( axisHelper );
+axisHelper.visible = false;
+
+//grid xz
+ var gridXZ = new THREE.GridHelper(10, 10);
+ scene.add(gridXZ);
+gridXZ.visible = false;
+
+//==============================================
+
 // OR http://davidscottlyons.com/threejs-intro/#slide-40
 container = document.getElementById( 'container' );
 var controls = new THREE.OrbitControls( camera, container );
@@ -47,6 +61,7 @@ function initGUI()
             radius: 1.0,
             mesh_segments:32,
         },
+
         renderBox: function() {
             cubeGeometry(this.cube.width, this.cube.height, this.cube.depth);
         },
@@ -65,6 +80,8 @@ function initGUI()
             camera.position.x = 3;
             camera.position.y = 3;
             this.camera.speed = 0.0001;
+            axisHelper.visible = false;
+            gridXZ.visible = false;
         },
         export2OBJ: function(){
             export2OBJ();
@@ -100,6 +117,11 @@ function initGUI()
     cam.add(camera.position, 'y', 0, 100).listen();
     cam.add(parameters, 'reset');
     cam.close();
+
+    // Scene
+    var sce = gui.addFolder('Scene');
+    sce.add(axisHelper, 'visible').name('Axis').listen();
+    sce.add(gridXZ, 'visible').name('XZ grid').listen();
     
     gui.add(parameters, 'export2OBJ');
 };
