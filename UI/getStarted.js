@@ -28,8 +28,11 @@ gridXZ.visible = false;
 container = document.getElementById( 'container' );
 var controls = new THREE.OrbitControls( camera, container );
 
-var pointLight = new THREE.PointLight( 0xffffff, 1 );
-camera.add( pointLight );
+// var pointLight = new THREE.PointLight( 0xffffff, 1 );
+// camera.add( pointLight );
+var light = new THREE.DirectionalLight(0x444444, 1);
+light.position.set(0, 0, 1).normalize();
+scene.add(light);
 
 renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
@@ -127,10 +130,6 @@ function initGUI()
 };
 
 initGUI();
-
-//=================== Obejct List ===============================
-
-// var group = new THREE.Group();
 
 // ============================= Cube ========================
 
