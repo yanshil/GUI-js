@@ -235,6 +235,23 @@ function cylinderGeometry(radius, height, cylinder_segments, position_x, positio
 
 };
 
+//============= CSG  Test ========================
+
+var cube_geometry = new THREE.CubeGeometry( 3, 3, 3 );
+var cube_mesh = new THREE.Mesh( cube_geometry );
+var cube_bsp = new ThreeBSP( cube_mesh );
+var sphere_geometry = new THREE.SphereGeometry( 1.8, 32, 32 );
+var sphere_mesh = new THREE.Mesh( sphere_geometry );
+var sphere_bsp = new ThreeBSP( sphere_mesh );
+
+var subtract_bsp = cube_bsp.subtract( sphere_bsp );
+var result = subtract_bsp.toMesh(new THREE.MeshLambertMaterial( { color: 0x00ff00, wireframe: true } ));
+result.geometry.computeVertexNormals();
+scene.add(result);
+
+
+//===========================================
+
 dat.GUI.prototype.removeFolder = function(name) {
     var folder = this.__folders[name];
     if (!folder) {
