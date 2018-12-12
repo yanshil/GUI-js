@@ -1,14 +1,36 @@
-var container, camera, scene, renderer;
+// var container, camera, scene, renderer;
 
-scene = new THREE.Scene();
-scene.background = new THREE.Color( 0x8FBCD4 );
-scene.add( new THREE.AmbientLight( 0x8FBCD4, 0.4 ) );
+// scene = new THREE.Scene();
+// scene.background = new THREE.Color( 0x8FBCD4 );
+// scene.add( new THREE.AmbientLight( 0x8FBCD4, 0.4 ) );
 
-camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
-camera.position.x = 3;
-camera.position.y = 3;
-camera.position.z = 5;
-scene.add( camera );
+// camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+// camera.position.x = 3;
+// camera.position.y = 3;
+// camera.position.z = 5;
+// scene.add( camera );
+
+
+// //==============================================
+
+// // OR http://davidscottlyons.com/threejs-intro/#slide-40
+// container = document.getElementById( 'container' );
+// var controls = new THREE.OrbitControls( camera, container );
+
+// // var pointLight = new THREE.PointLight( 0xffffff, 1 );
+// // camera.add( pointLight );
+// var light = new THREE.DirectionalLight(0x444444, 1);
+// light.position.set(0, 0, 1).normalize();
+// scene.add(light);
+
+// renderer = new THREE.WebGLRenderer();
+// renderer.setSize( window.innerWidth, window.innerHeight );
+// document.body.appendChild( renderer.domElement );
+
+// // OrbitControls: For Draging support
+// container.appendChild( renderer.domElement );
+// // Event listener: resize window
+// window.addEventListener( 'resize', onWindowResize, false );
 
 
 // =========================Axis Helper =============
@@ -17,31 +39,11 @@ var axisHelper = new THREE.AxesHelper( 5 );
 scene.add( axisHelper );
 axisHelper.visible = false;
 
+// ================== Grid ================
 //grid xz
- var gridXZ = new THREE.GridHelper(10, 10);
- scene.add(gridXZ);
+var gridXZ = new THREE.GridHelper(10, 10);
+scene.add(gridXZ);
 gridXZ.visible = false;
-
-//==============================================
-
-// OR http://davidscottlyons.com/threejs-intro/#slide-40
-container = document.getElementById( 'container' );
-var controls = new THREE.OrbitControls( camera, container );
-
-// var pointLight = new THREE.PointLight( 0xffffff, 1 );
-// camera.add( pointLight );
-var light = new THREE.DirectionalLight(0x444444, 1);
-light.position.set(0, 0, 1).normalize();
-scene.add(light);
-
-renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
-
-// OrbitControls: For Draging support
-container.appendChild( renderer.domElement );
-// Event listener: resize window
-window.addEventListener( 'resize', onWindowResize, false );
 
 //======================= GUI Folder ====================
 // Custom Global Variables
@@ -196,7 +198,7 @@ function sdfBox(point)
 
     return d;
 }
-parameters.cylinder
+
 //======================= Cylinders =================
 
 var cld_group = new THREE.Group();
@@ -256,20 +258,6 @@ function cylinderGeometry(radius, height, cylinder_segments, position_x, positio
 
 };
 
-//============= CSG  Test ========================
-
-var cube_geometry = new THREE.CubeGeometry( 3, 3, 3 );
-var cube_mesh = new THREE.Mesh( cube_geometry );
-var cube_bsp = new ThreeBSP( cube_mesh );
-var sphere_geometry = new THREE.SphereGeometry( 1.8, 32, 32 );
-var sphere_mesh = new THREE.Mesh( sphere_geometry );
-var sphere_bsp = new ThreeBSP( sphere_mesh );
-
-var subtract_bsp = cube_bsp.subtract( sphere_bsp );
-var result = subtract_bsp.toMesh(new THREE.MeshLambertMaterial( { color: 0x00ff00, wireframe: true } ));
-result.geometry.computeVertexNormals();
-scene.add(result);
-
 
 //===========================================
 
@@ -286,7 +274,7 @@ dat.GUI.prototype.removeFolder = function(name) {
 
 function removeCylinders()
 {
-    for (var i = cld_group.children.length - 1; i >= 0; i--) {parameters.cylinder
+    for (var i = cld_group.children.length - 1; i >= 0; i--) {
         var object = cld_group.children[i];
         cld_group.remove(object);
 
@@ -299,73 +287,73 @@ function removeCylinders()
     gui.removeFolder('Cylinder Groups');
 };
 
-//========================= RayCast ================================
-// https://threejs.org/docs/#api/en/core/Raycaster
+// //========================= RayCast ================================
+// // https://threejs.org/docs/#api/en/core/Raycaster
 
-var raycaster = new THREE.Raycaster();
-var mouse = new THREE.Vector2();
+// var raycaster = new THREE.Raycaster();
+// var mouse = new THREE.Vector2();
 
-function onDocumentMouseDown(event) {
+// function onDocumentMouseDown(event) {
 
-    // Orbit Controls cannot use this???? What????
-    // https://github.com/sotownsend/dat-gui/issues/5
-    // event.preventDefault();
+//     // Orbit Controls cannot use this???? What????
+//     // https://github.com/sotownsend/dat-gui/issues/5
+//     // event.preventDefault();
 
-    mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+//     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+// 	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
 
-    raycaster.setFromCamera( mouse, camera );
+//     raycaster.setFromCamera( mouse, camera );
 
-    var intersects = raycaster.intersectObjects(scene.children);
+//     var intersects = raycaster.intersectObjects(scene.children);
 
-    console.log(intersects);
+//     console.log(intersects);
 
-    if (intersects.length > 0) {
+//     if (intersects.length > 0) {
 
-        // intersects[ 0 ].object.material.color.set( 0x000000 );
+//         // intersects[ 0 ].object.material.color.set( 0x000000 );
 
-        console.log(intersects[0]);
-        // point, face, object....
-        console.log(intersects[0].point);
-        // parameters.cylinder.position_x = intersects[0].point.x;
-        // parameters.cylinder.position_y = intersects[0].point.y;
-        // parameters.cylinder.position_z = intersects[0].point.z;
-    }
-    if (intersects.length == 0) {
-        cube.material.color.set( 0x00ff00 );
-    }
-}
+//         console.log(intersects[0]);
+//         // point, face, object....
+//         console.log(intersects[0].point);
+//         // parameters.cylinder.position_x = intersects[0].point.x;
+//         // parameters.cylinder.position_y = intersects[0].point.y;
+//         // parameters.cylinder.position_z = intersects[0].point.z;
+//     }
+//     if (intersects.length == 0) {
+//         cube.material.color.set( 0x00ff00 );
+//     }
+// }
 
-document.addEventListener('mousedown', onDocumentMouseDown, false);
+// document.addEventListener('mousedown', onDocumentMouseDown, false);
 
 
-//========================== Render ================================
+// //========================== Render ================================
 
-var render = function () {
+// var render = function () {
 
-    requestAnimationFrame( render );
+//     requestAnimationFrame( render );
 
-    // var timer = Date.now() * parameters.camera.speed;
+//     // var timer = Date.now() * parameters.camera.speed;
 
-    // camera.position.x = Math.cos(timer);
-    // camera.position.z = Math.sin(timer);
+//     // camera.position.x = Math.cos(timer);
+//     // camera.position.z = Math.sin(timer);
 
-    // console.log(camera.position.x, camera.position.y, camera.position.z);
+//     // console.log(camera.position.x, camera.position.y, camera.position.z);
 
-    camera.lookAt(scene.position);
-    camera.updateMatrixWorld();
+//     camera.lookAt(scene.position);
+//     camera.updateMatrixWorld();
 
-    renderer.render( scene, camera );
-};
+//     renderer.render( scene, camera );
+// };
 
-render();
+// render();
 
-function onWindowResize() {
+// function onWindowResize() {
 
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize( window.innerWidth, window.innerHeight );
-}
+//     camera.aspect = window.innerWidth / window.innerHeight;
+//     camera.updateProjectionMatrix();
+//     renderer.setSize( window.innerWidth, window.innerHeight );
+// }
 
 // ================= Exporter =========================
 
