@@ -1,38 +1,3 @@
-// var container, camera, scene, renderer;
-
-// scene = new THREE.Scene();
-// scene.background = new THREE.Color( 0x8FBCD4 );
-// scene.add( new THREE.AmbientLight( 0x8FBCD4, 0.4 ) );
-
-// camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
-// camera.position.x = 3;
-// camera.position.y = 3;
-// camera.position.z = 5;
-// scene.add( camera );
-
-
-// //==============================================
-
-// // OR http://davidscottlyons.com/threejs-intro/#slide-40
-// container = document.getElementById( 'container' );
-// var controls = new THREE.OrbitControls( camera, container );
-
-// // var pointLight = new THREE.PointLight( 0xffffff, 1 );
-// // camera.add( pointLight );
-// var light = new THREE.DirectionalLight(0x444444, 1);
-// light.position.set(0, 0, 1).normalize();
-// scene.add(light);
-
-// renderer = new THREE.WebGLRenderer();
-// renderer.setSize( window.innerWidth, window.innerHeight );
-// document.body.appendChild( renderer.domElement );
-
-// // OrbitControls: For Draging support
-// container.appendChild( renderer.domElement );
-// // Event listener: resize window
-// window.addEventListener( 'resize', onWindowResize, false );
-
-
 // =========================Axis Helper =============
 // The X axis is red. The Y axis is green. The Z axis is blue.
 var axisHelper = new THREE.AxesHelper( 5 );
@@ -50,14 +15,25 @@ gridXZ.visible = false;
 var parameters, gui;
 var cube;
 
+// ================ Global ID variable ==================
+var objectID = 0, cylinderID = 0;
+
+var cld_group = new THREE.Group();
+
+var gui_cld;
+var gui_cld_list = [];
+
+var cubeCSG, resultCSG, resultMesh;
+//=======================================================
+
 function initGUI()
 {
     parameters = {
+        material: "Phong",
         cube: {
             width:3,
             height:1,
             depth:5,
-            material: "Wireframe",
         },
         cylinder: {
             position_x: 0.0,
@@ -75,7 +51,8 @@ function initGUI()
                 this.cylinder.position_x, this.cylinder.position_y, this.cylinder.position_z);
         },
         removeAllCylinder: function() {
-            removeCylinders();
+            removeAllCylinders();
+            cubeGeometry(this.cube.width, this.cube.height, this.cube.depth);
         },
         camera: {
             speed: 0.0001
@@ -96,14 +73,23 @@ function initGUI()
     gui = new dat.GUI();
 
     // Box
-    var boxxx = gui.addFolder('Boxxx');
+    var boxxx = gui.addFolder('Box');
     boxxx.add(parameters.cube, 'width').name('width');
     boxxx.add(parameters.cube, 'height').name('height');
     boxxx.add(parameters.cube, 'depth').name('depth');
-    var cubeMaterial = boxxx.add( parameters.cube, 'material', [ "Basic", "Lambert", "Phong", "Wireframe" ] ).name('Material Type').listen();
-	cubeMaterial.onChange(function(value) 
-	{   updateMaterial();   });
-    boxxx.add(parameters, 'renderBox').name('Render Box');
+    var globalMaterial = boxxx.add( parameters, 'material', [ "Basic", "Lambert", "Phong", "Wireframe" ] ).name('Material Type').listen();
+	globalMaterial.onChange(function(value) 
+	{
+        if(resultMesh === undefined)
+        {
+            return;
+        }
+        else
+        {
+            resultMesh.material = getGlobalMaterial();
+        }
+    });
+    boxxx.add(parameters, 'renderBox').name('(Re)Render Box');
     boxxx.open();
 
     // Cylinder
@@ -113,8 +99,8 @@ function initGUI()
     cylinder.add(parameters.cylinder, 'position_z').name('z');
     cylinder.add(parameters.cylinder, 'radius').name('radius');
     cylinder.add(parameters.cylinder, 'mesh_segments').name('face segments');
-    cylinder.add(parameters, 'addCylinder').name('Add new cld');
-    cylinder.add(parameters, 'removeAllCylinder').name('rm all clds');
+    cylinder.add(parameters, 'addCylinder').name('Add New Cylinder');
+    cylinder.add(parameters, 'removeAllCylinder').name('Remove All Cylinders');
 
     // Camera
     var cam = gui.addFolder('Camera');
@@ -128,37 +114,39 @@ function initGUI()
     sce.add(axisHelper, 'visible').name('Axis').listen();
     sce.add(gridXZ, 'visible').name('XZ grid').listen();
     
-    gui.add(parameters, 'export2OBJ');
+    gui.add(parameters, 'export2OBJ').name('Export OBJ File');
 };
 
-initGUI();
-
 // ============================= Cube ========================
-
-var cubeID = 0, cylinderID = 0;
 
 function cubeGeometry(w, h, d)
 {
     var geometry = new THREE.BoxGeometry(w, h, d, Math.floor(w), Math.floor(h), Math.floor(d) );
-    var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    var material = getGlobalMaterial();
     cube = new THREE.Mesh( geometry, material );
-    updateMaterial();
 
     // Remove last cube if not the very first one
     // Only one cube exist for current scene
-    if (cubeID > 0) {
+    if (objectID > 0) {
         // If not the very first round to create new Cube.
-        console.log("Remove Cube with ID = ", cubeID);
-        remove(cubeID);
+        console.log("Remove object with ID = ", objectID);
+        remove(objectID);
     }
     // Assign new ID
-    cubeID = cubeID + 1;
-    console.log("Add Cube with ID = ", cubeID);
-    cube.name = cubeID;
-    scene.add(cube);
+    objectID = objectID + 1;
+    console.log("Add Object with ID = ", objectID);
+
+    // CSG Object
+    cubeCSG = THREE.CSG.fromMesh(cube);
+    resultCSG = cubeCSG;
+    resultMesh = THREE.CSG.toMesh(resultCSG, material);
+
+    resultMesh.name = objectID;
+
+    scene.add(resultMesh);
 };
 
-// Remove with GC
+// Remove Object with GC
 function remove(id) {
     v = scene.getObjectByName(id);
     v.material.dispose();
@@ -166,10 +154,10 @@ function remove(id) {
     scene.remove(v);
 }
 
-// ========
-function updateMaterial()
+// ===========================
+function getGlobalMaterial()
 {
-    var value = parameters.cube.material;
+    var value = parameters.material;
     var newMaterial;
 	if (value == "Basic")
 		newMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
@@ -180,7 +168,7 @@ function updateMaterial()
 	else // (value == "Wireframe")
         newMaterial = new THREE.MeshBasicMaterial( { wireframe: true, color: 0x00ff00  } );
     
-    cube.material = newMaterial;
+    return newMaterial;
 }
 
 // 'Fake' SDF. For not calculating the 'y' axis
@@ -201,17 +189,12 @@ function sdfBox(point)
 
 //======================= Cylinders =================
 
-var cld_group = new THREE.Group();
-
-var cld;
-var cldFolder = [];
-
 // cylinderGeometry(radius, height, heightSements)
 function cylinderGeometry(radius, height, cylinder_segments, position_x, position_y, position_z)
 {
     if(cylinder_segments < 8)
     {
-        alert("Too few face segments will cause problems!");
+        alert("Too few face segments may cause problems!");
     }
     var center = new THREE.Vector3( position_x, cube.position.y, position_z );
 
@@ -221,13 +204,14 @@ function cylinderGeometry(radius, height, cylinder_segments, position_x, positio
     
     if((radius > Math.abs(d)) | d > 0)
     {
-        alert("Cylinder outside box! Fail to create this cylinder");
+        alert("Cylinder outside box! Fail to create this cylinder.");
         return;
     }
 
     // RadiusTop, radiusBottom, height, radialSegments, HeightSegments
     var geometry = new THREE.CylinderGeometry( radius, radius, height, cylinder_segments);
-    var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+    // var material = new THREE.MeshPhongMaterial( { color: 0x00ff00 } );
+    var material = getGlobalMaterial();
     var cylinder = new THREE.Mesh( geometry, material );
 
     // Adjust position
@@ -240,23 +224,44 @@ function cylinderGeometry(radius, height, cylinder_segments, position_x, positio
     cylinderID = cylinderID + 1;
     cylinder.name = cylinderID;
 
-    scene.remove(cld_group);
+    // scene.remove(cld_group);
+    cylinder.select = true;
     cld_group.add(cylinder);
-    scene.add(cld_group);
+    // scene.add(cld_group);
     
     // scene.add( cylinder );
     console.log("Add cylinder with ID = ", cylinderID);
 
     if (cylinderID == 1) {
-        cld = gui.addFolder('Cylinder Groups');
+        gui_cld = gui.addFolder('Cylinder Groups');
     }
 
-    cld_group.children[cylinderID-1].material.wireframe = true;
-    var tmp = cld.add(cld_group.children[cylinderID-1].material, 'wireframe').name('wireframe'+ (cylinderID)).listen();
-    cldFolder.push(tmp);
-    cld.open();
+    var tmp = gui_cld.add(cld_group.children[cylinderID-1], 'select').name('ID: '+ (cylinderID)).onChange(function(value){
+        updateResultMesh();
+    });
+    gui_cld_list.push(tmp);
+    gui_cld.open();
 
+    // CSG
+    updateResultMesh();
 };
+
+function updateResultMesh()
+{
+    resultCSG = cubeCSG;
+    for (let i = 0; i < cld_group.children.length; i++) {
+        if (cld_group.children[i].select) {
+            
+            var cylinderCSG = THREE.CSG.fromMesh(cld_group.children[i]);
+            resultCSG = resultCSG.subtract(cylinderCSG);
+        }
+    }
+
+    scene.remove(resultMesh);
+    resultMesh = THREE.CSG.toMesh(resultCSG, getGlobalMaterial());
+    resultMesh.name = objectID;
+    scene.add(resultMesh);
+}
 
 
 //===========================================
@@ -272,7 +277,10 @@ dat.GUI.prototype.removeFolder = function(name) {
     this.onResize();
 }
 
-function removeCylinders()
+/**
+ * Remove All cylinders from the scene
+ */
+function removeAllCylinders()
 {
     for (var i = cld_group.children.length - 1; i >= 0; i--) {
         var object = cld_group.children[i];
@@ -280,98 +288,27 @@ function removeCylinders()
 
         object.material.dispose();
         object.geometry.dispose();
-        scene.remove(object);
+        // scene.remove(object);
     }
     // Reset CylinderID
     cylinderID = 0;
     gui.removeFolder('Cylinder Groups');
 };
 
-// //========================= RayCast ================================
-// // https://threejs.org/docs/#api/en/core/Raycaster
-
-// var raycaster = new THREE.Raycaster();
-// var mouse = new THREE.Vector2();
-
-// function onDocumentMouseDown(event) {
-
-//     // Orbit Controls cannot use this???? What????
-//     // https://github.com/sotownsend/dat-gui/issues/5
-//     // event.preventDefault();
-
-//     mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-// 	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-//     raycaster.setFromCamera( mouse, camera );
-
-//     var intersects = raycaster.intersectObjects(scene.children);
-
-//     console.log(intersects);
-
-//     if (intersects.length > 0) {
-
-//         // intersects[ 0 ].object.material.color.set( 0x000000 );
-
-//         console.log(intersects[0]);
-//         // point, face, object....
-//         console.log(intersects[0].point);
-//         // parameters.cylinder.position_x = intersects[0].point.x;
-//         // parameters.cylinder.position_y = intersects[0].point.y;
-//         // parameters.cylinder.position_z = intersects[0].point.z;
-//     }
-//     if (intersects.length == 0) {
-//         cube.material.color.set( 0x00ff00 );
-//     }
-// }
-
-// document.addEventListener('mousedown', onDocumentMouseDown, false);
-
-
-// //========================== Render ================================
-
-// var render = function () {
-
-//     requestAnimationFrame( render );
-
-//     // var timer = Date.now() * parameters.camera.speed;
-
-//     // camera.position.x = Math.cos(timer);
-//     // camera.position.z = Math.sin(timer);
-
-//     // console.log(camera.position.x, camera.position.y, camera.position.z);
-
-//     camera.lookAt(scene.position);
-//     camera.updateMatrixWorld();
-
-//     renderer.render( scene, camera );
-// };
-
-// render();
-
-// function onWindowResize() {
-
-//     camera.aspect = window.innerWidth / window.innerHeight;
-//     camera.updateProjectionMatrix();
-//     renderer.setSize( window.innerWidth, window.innerHeight );
-// }
-
 // ================= Exporter =========================
-
-function export2PLY()
-{
-    // Instantiate an exporter
-    var exporter = new THREE.PLYExporter();
-    // Parse the input and generate the ply output
-    exporter.parse(scene, data => console.log(data), { binary: true, excludeAttributes: [ 'color' ] });
-}
 
 function export2OBJ()
 {
     // Instantiate an exporter
     var exporter = new THREE.OBJExporter();
-    // var data = exporter.parse(cube);
-    for (let i = 0; i < scene.children.length; i++) {
-        data = exporter.parse(scene.children[i]);
-        console.log(data);
-    }
+
+    data = exporter.parse(resultMesh);
+    console.log(data);
 }
+
+// ======================= Main Logic ==================================
+
+initGUI();
+
+// Initialize a cube in the page
+// cubeGeometry(3, 1, 5);
