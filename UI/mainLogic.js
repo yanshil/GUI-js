@@ -115,7 +115,7 @@ function initGUI()
     sce.add(axisHelper, 'visible').name('Axis').listen();
     sce.add(gridXZ, 'visible').name('XZ grid').listen();
     
-    gui.add(parameters, 'export2OBJ').name('Export OBJ File');
+    // gui.add(parameters, 'export2OBJ').name('Export OBJ File');
 };
 
 // ============================= Cube ========================
@@ -305,7 +305,30 @@ function export2OBJ()
 
     data = exporter.parse(resultMesh);
     console.log(data);
+    return data;
 }
+
+function download(filename, text) {
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+  
+    element.style.display = 'none';
+    document.body.appendChild(element);
+  
+    element.click();
+  
+    document.body.removeChild(element);
+}
+
+// Start file download.
+document.getElementById("info").addEventListener("click", function(){
+    // Generate download of hello.txt file with some content
+    var text = export2OBJ();
+    var filename = "object.obj";
+    
+    download(filename, text);
+}, false);
 
 // ======================= Main Logic ==================================
 
