@@ -44,6 +44,7 @@ function initGUI()
         },
 
         renderBox: function() {
+            removeAllCylinders();
             cubeGeometry(this.cube.width, this.cube.height, this.cube.depth);
         },
         addCylinder: function() {
@@ -311,4 +312,4 @@ function export2OBJ()
 initGUI();
 
 // Initialize a cube in the page
-// cubeGeometry(3, 1, 5);
+cubeGeometry(3, 1, 5);
