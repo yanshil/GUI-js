@@ -14,7 +14,6 @@ app.on('window-all-closed', () => {
 })
 
 
-
 function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({ width: 800, height: 600 })
@@ -32,6 +31,10 @@ function createWindow () {
     // when you should delete the corresponding element.
     win = null
   })
+
+  win.webContents.on("devtools-opened", () => {
+    win.webContents.closeDevTools();
+  });
 }
 
 
