@@ -25,6 +25,21 @@ var gui_cld_list = [];
 
 var cubeCSG, resultCSG, resultMesh;
 //=======================================================
+// Emscripten
+
+var canvas = document.getElementById("canvas");
+//make the canvas fullscreen
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+//show Emscripten environment where the canvas is
+var Module = {};
+Module.canvas = canvas;
+
+//bindings to C++ functions
+var getNewX = Module.cwrap('setXposition', 'number', ['number']);
+
+
+//===================================
 
 function initGUI()
 {
@@ -68,10 +83,16 @@ function initGUI()
         },
         export2OBJ: function(){
             export2OBJ();
-        }
+        },
+        testCpp: function() {
+            var newX = getNewX(this.cube.width, cube.position.x);
+            console.log(newX);
+        } 
     };
 
     gui = new dat.GUI();
+
+    gui.add(parameters, 'testCpp')
 
     // Box
     var boxxx = gui.addFolder('Box');
