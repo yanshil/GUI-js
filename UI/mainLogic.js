@@ -27,7 +27,7 @@ var cubeCSG, resultCSG, resultMesh;
 //=======================================================
 // Emscripten
 
-var canvas = document.getElementById("canvas");
+var canvas = document.getElementById("container");
 //make the canvas fullscreen
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
@@ -36,7 +36,6 @@ var Module = {};
 Module.canvas = canvas;
 
 //bindings to C++ functions
-var getNewX = Module.cwrap('setXposition', 'number', ['number']);
 
 
 //===================================
@@ -85,8 +84,28 @@ function initGUI()
             export2OBJ();
         },
         testCpp: function() {
-            var newX = getNewX(this.cube.width, cube.position.x);
+            var newX = Module.ccall('setXposition', 
+            'number', ['number', 'number'],
+            [this.cube.width, cube.position.x]);
             console.log(newX);
+            var newY = Module.ccall('setXposition', 
+            'number', ['number', 'number'],
+            [this.cube.height, cube.position.y]);
+            console.log(newY);
+            var newZ = Module.ccall('setXposition', 
+            'number', ['number', 'number'],
+            [this.cube.depth, cube.position.z]);
+            console.log(newZ);
+
+            cube.position.x = newX;
+            resultMesh.position.x = newX;
+
+            cube.position.y = newY;
+            resultMesh.position.y = newY;
+
+            cube.position.z = newZ;
+            resultMesh.position.z = newZ;
+            
         } 
     };
 
