@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+	<head>
+		<title>Cut Hole Demo</title>
+		<meta charset="utf-8">
+		<style>
+			body {
+				font-family: Monospace;
+				font-size: 13px;
+				margin: 0px;
+				overflow: hidden;
+				text-align: center;
+			}
+			/* canvas { width: 100%; height: 100% } */
+				#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+			}
+		</style>
+		 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	</head>
+	
+	<body>
+		<div id="info">
+			<a href="#">Download as OBJ File</a>
+		</div>
+		<div id="container"></div>
+		
+		<script src="js/three.min.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/WebGL.js"></script>
+		<script src="js/libs/dat.gui.min.js"></script>
+		<script src="js/exporters/OBJExporter.js"></script>
+		<script src="vendor/THREE.CSG.js"></script>
+
+		<script src="scene.config.js"></script>
+		<script src="mainLogic.js"></script>
+		
+	</body>
+</html>
