@@ -1,8 +1,19 @@
 {
   "name": "box-app",
   "version": "0.1.0",
+  "description": "Box App With cpp",
   "main": "main.js",
+  "private": true,
+  "gypfile": true,
+  "dependencies": {
+    "bindings": "~1.2.1",
+    "connect": "^3.6.6",
+    "node-addon-api": "^1.0.0",
+    "serve-static": "^1.13.2",
+    "three": "^0.99.0"
+  },
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "test": "node addon.js"
   }
 }

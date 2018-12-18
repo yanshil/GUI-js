@@ -9,3 +9,20 @@ Compiler from LLVM to js
 ```
 emcc TestEmscripten.cpp -o te.js -s FULL_ES2=1 -s EXPORTED_FUNCTIONS=['_setXposition'] -s WASM=0 -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall', 'cwrap']"
 ```
+
+### Dependency
+```
+./TestEmscripten.cpp
+./te.js 	// Generated file
+```
+
+## Add-on
+
+```
+./binding.gyp
+./addon.js
+./addon.cpp
+./package.json
+```
+
+
